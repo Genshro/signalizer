@@ -1,0 +1,587 @@
+# 🚀 SIGNALIZER - Proje İlerleme Stratejisi
+
+## 📋 Proje Yapısı ve Teknoloji Yığını
+
+### 🏗️ Ana Klasör Yapısı
+```
+signalizer/
+├── backend/                    # Go Backend API
+├── mobile/                     # Flutter Mobile App
+├── shared/                     # Ortak dosyalar
+├── docs/                       # Dokümantasyon
+├── scripts/                    # Deployment ve utility scriptler
+├── docker/                     # Docker konfigürasyonları
+└── .github/                    # CI/CD workflows
+```
+
+## 🔧 Backend Yapısı (Go - Clean Architecture)
+
+### 📁 Backend Klasör Yapısı
+```
+backend/
+├── cmd/
+│   └── api/
+│       └── main.go            # Ana uygulama entry point
+├── internal/
+│   ├── config/                # Konfigürasyon yönetimi
+│   │   ├── config.go
+│   │   └── env.go
+│   ├── domain/                # Domain katmanı (Entities)
+│   │   ├── coin.go
+│   │   ├── signal.go
+│   │   ├── user.go
+│   │   └── indicator.go
+│   ├── repository/            # Data Access Layer
+│   │   ├── interfaces/
+│   │   │   ├── coin_repository.go
+│   │   │   ├── signal_repository.go
+│   │   │   └── user_repository.go
+│   │   ├── supabase/
+│   │   │   ├── coin_repository.go
+│   │   │   ├── signal_repository.go
+│   │   │   ├── user_repository.go
+│   │   │   └── supabase_client.go
+│   │   └── redis/
+│   │       ├── cache_repository.go
+│   │       └── pubsub_repository.go
+│   ├── usecase/               # Business Logic Layer
+│   │   ├── interfaces/
+│   │   │   ├── coin_usecase.go
+│   │   │   ├── signal_usecase.go
+│   │   │   └── user_usecase.go
+│   │   ├── coin_usecase.go
+│   │   ├── signal_usecase.go
+│   │   └── user_usecase.go
+│   ├── delivery/              # Presentation Layer
+│   │   ├── http/
+│   │   │   ├── handlers/
+│   │   │   │   ├── coin_handler.go
+│   │   │   │   ├── signal_handler.go
+│   │   │   │   └── user_handler.go
+│   │   │   ├── middleware/
+│   │   │   │   ├── auth.go
+│   │   │   │   ├── cors.go
+│   │   │   │   └── rate_limit.go
+│   │   │   └── router.go
+│   │   └── websocket/
+│   │       ├── hub.go
+│   │       └── client.go
+│   ├── services/              # External Services
+│   │   ├── binance/
+│   │   │   ├── client.go
+│   │   │   └── websocket.go
+│   │   ├── indicators/
+│   │   │   ├── ribqa.go
+│   │   │   ├── gcr_fractal.go
+│   │   │   └── ricci_flow.go
+│   │   ├── notification/
+│   │   │   └── firebase.go
+│   │   ├── auth/
+│   │   │   ├── jwt.go
+│   │   │   └── supabase_auth.go
+│   │   └── supabase/
+│   │       ├── client.go
+│   │       └── realtime.go
+│   └── utils/                 # Utility fonksiyonlar
+│       ├── logger.go
+│       ├── validator.go
+│       └── response.go
+├── pkg/                       # Public packages
+│   ├── database/
+│   │   ├── supabase.go
+│   │   └── redis.go
+│   └── errors/
+│       └── custom_errors.go
+├── supabase/                  # Supabase configurations
+│   ├── migrations/
+│   │   ├── 001_create_users.sql
+│   │   ├── 002_create_coins.sql
+│   │   └── 003_create_signals.sql
+│   ├── seed.sql
+│   └── config.toml
+├── go.mod
+├── go.sum
+├── Dockerfile
+└── .env.example
+```
+
+## 📱 Mobile Yapısı (Flutter - Clean Architecture)
+
+### 📁 Mobile Klasör Yapısı
+```
+mobile/
+├── lib/
+│   ├── main.dart              # Ana uygulama entry point
+│   ├── app.dart               # App widget
+│   ├── core/                  # Core utilities
+│   │   ├── constants/
+│   │   │   ├── app_constants.dart
+│   │   │   ├── api_constants.dart
+│   │   │   └── theme_constants.dart
+│   │   ├── errors/
+│   │   │   ├── failures.dart
+│   │   │   └── exceptions.dart
+│   │   ├── network/
+│   │   │   ├── api_client.dart
+│   │   │   └── websocket_client.dart
+│   │   ├── theme/
+│   │   │   ├── app_theme.dart
+│   │   │   ├── dark_theme.dart
+│   │   │   └── light_theme.dart
+│   │   └── utils/
+│   │       ├── logger.dart
+│   │       ├── validators.dart
+│   │       └── formatters.dart
+│   ├── features/              # Feature-based organization
+│   │   ├── auth/
+│   │   │   ├── data/
+│   │   │   │   ├── datasources/
+│   │   │   │   │   ├── auth_local_datasource.dart
+│   │   │   │   │   └── auth_remote_datasource.dart
+│   │   │   │   ├── models/
+│   │   │   │   │   ├── user_model.dart
+│   │   │   │   │   └── auth_response_model.dart
+│   │   │   │   └── repositories/
+│   │   │   │       └── auth_repository_impl.dart
+│   │   │   ├── domain/
+│   │   │   │   ├── entities/
+│   │   │   │   │   └── user.dart
+│   │   │   │   ├── repositories/
+│   │   │   │   │   └── auth_repository.dart
+│   │   │   │   └── usecases/
+│   │   │   │       ├── login_usecase.dart
+│   │   │   │       └── logout_usecase.dart
+│   │   │   └── presentation/
+│   │   │       ├── bloc/
+│   │   │       │   ├── auth_bloc.dart
+│   │   │       │   ├── auth_event.dart
+│   │   │       │   └── auth_state.dart
+│   │   │       └── pages/
+│   │   │           ├── login_page.dart
+│   │   │           └── register_page.dart
+│   │   ├── dashboard/
+│   │   │   ├── data/
+│   │   │   ├── domain/
+│   │   │   └── presentation/
+│   │   ├── coin_detail/
+│   │   │   ├── data/
+│   │   │   ├── domain/
+│   │   │   └── presentation/
+│   │   ├── settings/
+│   │   │   ├── data/
+│   │   │   ├── domain/
+│   │   │   └── presentation/
+│   │   └── notifications/
+│   │       ├── data/
+│   │       ├── domain/
+│   │       └── presentation/
+│   └── injection_container.dart # Dependency Injection
+├── assets/
+│   ├── images/
+│   ├── icons/
+│   └── fonts/
+├── test/
+│   ├── unit/
+│   ├── widget/
+│   └── integration/
+├── pubspec.yaml
+├── pubspec.lock
+└── analysis_options.yaml
+```
+
+## 🎯 SOLID Prensipler ve Best Practices
+
+### 1. Single Responsibility Principle (SRP)
+- **Backend:** Her handler sadece bir endpoint'i yönetir
+- **Mobile:** Her widget sadece bir UI bileşenini temsil eder
+- **Örnek:** `CoinHandler` sadece coin işlemlerini, `UserHandler` sadece kullanıcı işlemlerini yönetir
+
+### 2. Open/Closed Principle (OCP)
+- **Interface kullanımı:** Repository pattern ile genişletilebilir yapı
+- **Strategy Pattern:** Farklı indikatör algoritmaları için
+```go
+type IndicatorCalculator interface {
+    Calculate(data []float64) Signal
+}
+
+type RIBQACalculator struct{}
+type GCRFractalCalculator struct{}
+```
+
+### 3. Liskov Substitution Principle (LSP)
+- **Repository interfaces:** Farklı database implementasyonları değiştirilebilir
+- **UseCase interfaces:** Test edilebilir mock implementasyonlar
+
+### 4. Interface Segregation Principle (ISP)
+- **Küçük, spesifik interfaceler:** 
+```go
+type CoinReader interface {
+    GetCoin(id string) (*Coin, error)
+}
+
+type CoinWriter interface {
+    SaveCoin(coin *Coin) error
+}
+```
+
+### 5. Dependency Inversion Principle (DIP)
+- **Dependency Injection:** Constructor injection kullanımı
+- **Abstractions:** Concrete implementasyonlara değil, interfacelere bağımlılık
+
+## 📊 Geliştirme Aşamaları
+
+### 🚀 Faz 1: Temel Altyapı (Hafta 1-2)
+- [ ] Backend Go projesi setup
+- [ ] Database schema tasarımı
+- [ ] Docker konfigürasyonu
+- [ ] CI/CD pipeline kurulumu
+- [ ] Flutter projesi setup
+
+### 🔧 Faz 2: Backend Core (Hafta 3-4)
+- [ ] Clean Architecture implementasyonu
+- [ ] Supabase client setup ve konfigürasyon
+- [ ] Supabase repository katmanı
+- [ ] Redis cache implementasyonu
+- [ ] Supabase Authentication entegrasyonu
+- [ ] Basic REST API endpoints
+
+### 📊 Faz 3: Data Integration (Hafta 5-6)
+- [ ] Binance API entegrasyonu
+- [ ] WebSocket real-time data
+- [ ] İndikatör hesaplama motoru
+- [ ] Signal generation logic
+
+### 📱 Faz 4: Mobile Core (Hafta 7-8)
+- [ ] Flutter Clean Architecture
+- [ ] BLoC state management
+- [ ] API client implementasyonu
+- [ ] Temel UI komponentleri
+
+### 🎨 Faz 5: UI/UX (Hafta 9-10)
+- [ ] Dashboard ekranı
+- [ ] Coin detail ekranı
+- [ ] Settings ekranı
+- [ ] Dark/Light theme
+
+### 🔔 Faz 6: Advanced Features (Hafta 11-12)
+- [ ] Push notifications
+- [ ] WebSocket real-time updates
+- [ ] Favorites management
+- [ ] Multi-currency support
+
+### 🧪 Faz 7: Testing & Optimization (Hafta 13-14)
+- [ ] Unit tests
+- [ ] Integration tests
+- [ ] Performance optimization
+- [ ] Security audit
+
+### 🚀 Faz 8: Deployment (Hafta 15-16)
+- [ ] Production deployment
+- [ ] App Store submission
+- [ ] Play Store submission
+- [ ] Monitoring setup
+
+## 🛠️ Teknoloji Detayları
+
+### Backend Dependencies (Go)
+```go
+// go.mod
+module signalizer-backend
+
+go 1.21
+
+require (
+    github.com/gin-gonic/gin v1.9.1
+    github.com/supabase-community/supabase-go v0.0.1
+    github.com/lib/pq v1.10.9
+    github.com/go-redis/redis/v8 v8.11.5
+    github.com/golang-jwt/jwt/v5 v5.0.0
+    github.com/gorilla/websocket v1.5.0
+    github.com/joho/godotenv v1.4.0
+    github.com/sirupsen/logrus v1.9.3
+    github.com/go-playground/validator/v10 v10.15.5
+)
+```
+
+### Mobile Dependencies (Flutter)
+```yaml
+# pubspec.yaml
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # State Management
+  flutter_bloc: ^8.1.3
+  
+  # Network
+  dio: ^5.3.2
+  web_socket_channel: ^2.4.0
+  
+  # Supabase
+  supabase_flutter: ^2.0.0
+  
+  # Storage
+  shared_preferences: ^2.2.2
+  hive: ^2.2.3
+  
+  # UI
+  flutter_screenutil: ^5.9.0
+  cached_network_image: ^3.3.0
+  
+  # Notifications
+  firebase_messaging: ^14.7.6
+  
+  # Utils
+  get_it: ^7.6.4
+  dartz: ^0.10.1
+  equatable: ^2.0.5
+```
+
+## 🔒 Güvenlik Kuralları
+
+### Backend Security
+- [ ] JWT token expiration management
+- [ ] Rate limiting implementation
+- [ ] Input validation ve sanitization
+- [ ] SQL injection prevention
+- [ ] CORS configuration
+- [ ] Environment variables protection
+
+### Mobile Security
+- [ ] API key protection
+- [ ] Secure storage implementation
+- [ ] Certificate pinning
+- [ ] Biometric authentication
+- [ ] Data encryption
+
+## 📈 Performans Optimizasyonu
+
+### Backend Performance
+- [ ] Database indexing
+- [ ] Redis caching strategy
+- [ ] Connection pooling
+- [ ] Goroutine optimization
+- [ ] Memory leak prevention
+
+### Mobile Performance
+- [ ] Image optimization
+- [ ] List virtualization
+- [ ] Memory management
+- [ ] Network request optimization
+- [ ] Battery usage optimization
+
+## 🧪 Test Stratejisi
+
+### Backend Testing
+- [ ] Unit tests (80% coverage)
+- [ ] Integration tests
+- [ ] API endpoint tests
+- [ ] Database tests
+- [ ] Load testing
+
+### Mobile Testing
+- [ ] Unit tests
+- [ ] Widget tests
+- [ ] Integration tests
+- [ ] Golden tests
+- [ ] Performance tests
+
+## 📝 Dokümantasyon
+
+### API Documentation
+- [ ] OpenAPI/Swagger documentation
+- [ ] Postman collection
+- [ ] API versioning strategy
+
+### Code Documentation
+- [ ] Inline code comments
+- [ ] README dosyaları
+- [ ] Architecture decision records
+- [ ] Deployment guides
+
+## 🎯 Başarı Metrikleri
+
+### Teknik Metrikler
+- [ ] API response time < 200ms
+- [ ] App launch time < 3s
+- [ ] Crash rate < 1%
+- [ ] Memory usage < 100MB
+- [ ] Battery drain < 5%/hour
+
+### İş Metrikleri
+- [ ] Signal accuracy > 70%
+- [ ] User retention > 60%
+- [ ] Daily active users growth
+- [ ] Push notification open rate > 30%
+
+## 🔄 Sürekli Geliştirme
+
+### DevOps Pipeline
+- [ ] GitHub Actions CI/CD
+- [ ] Automated testing
+- [ ] Code quality checks
+- [ ] Security scanning
+- [ ] Automated deployment
+
+### Monitoring
+- [ ] Application monitoring (Sentry)
+- [ ] Performance monitoring (Grafana)
+- [ ] User analytics (Firebase Analytics)
+- [ ] Error tracking
+- [ ] Usage metrics
+
+---
+
+## 🚀 Supabase Entegrasyonu Detayları
+
+### 🔧 Supabase Özellikleri
+- **Authentication:** Email/password, OAuth (Google, GitHub), Magic Links
+- **Database:** PostgreSQL with Row Level Security (RLS)
+- **Realtime:** WebSocket subscriptions for live updates
+- **Storage:** File upload ve CDN
+- **Edge Functions:** Serverless functions (Deno runtime)
+- **API:** Auto-generated REST ve GraphQL API'ler
+
+### 📊 Supabase Database Schema
+```sql
+-- Users table (Supabase auth.users ile extend)
+CREATE TABLE public.user_profiles (
+    id UUID REFERENCES auth.users(id) PRIMARY KEY,
+    username VARCHAR(50) UNIQUE,
+    full_name VARCHAR(100),
+    avatar_url TEXT,
+    preferred_currency VARCHAR(3) DEFAULT 'USD',
+    notification_enabled BOOLEAN DEFAULT true,
+    theme_preference VARCHAR(10) DEFAULT 'system',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Coins table
+CREATE TABLE public.coins (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    symbol VARCHAR(20) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    current_price DECIMAL(20,8),
+    market_cap BIGINT,
+    volume_24h BIGINT,
+    price_change_24h DECIMAL(10,4),
+    last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    is_active BOOLEAN DEFAULT true
+);
+
+-- Signals table
+CREATE TABLE public.signals (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    coin_id UUID REFERENCES public.coins(id),
+    signal_type VARCHAR(20) NOT NULL, -- 'BUY', 'SELL', 'HOLD'
+    buy_zone_min DECIMAL(20,8),
+    buy_zone_max DECIMAL(20,8),
+    target_1 DECIMAL(20,8),
+    target_2 DECIMAL(20,8),
+    target_3 DECIMAL(20,8),
+    stop_loss DECIMAL(20,8),
+    confidence_score DECIMAL(3,2), -- 0.00 to 1.00
+    indicator_used VARCHAR(50),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    expires_at TIMESTAMP WITH TIME ZONE,
+    is_active BOOLEAN DEFAULT true
+);
+
+-- User favorites
+CREATE TABLE public.user_favorites (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES auth.users(id),
+    coin_id UUID REFERENCES public.coins(id),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(user_id, coin_id)
+);
+
+-- Row Level Security (RLS) Policies
+ALTER TABLE public.user_profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.user_favorites ENABLE ROW LEVEL SECURITY;
+
+-- User can only see/edit their own profile
+CREATE POLICY "Users can view own profile" ON public.user_profiles
+    FOR SELECT USING (auth.uid() = id);
+
+CREATE POLICY "Users can update own profile" ON public.user_profiles
+    FOR UPDATE USING (auth.uid() = id);
+
+-- User can only see/edit their own favorites
+CREATE POLICY "Users can manage own favorites" ON public.user_favorites
+    FOR ALL USING (auth.uid() = user_id);
+```
+
+### 🔄 Supabase Realtime Subscriptions
+```go
+// Backend - Supabase Realtime için signal publish
+func (s *SignalService) PublishSignal(signal *Signal) error {
+    // Supabase realtime channel'a publish
+    return s.supabaseClient.Channel("signals").Send("new_signal", signal)
+}
+```
+
+```dart
+// Flutter - Realtime subscription
+class SignalRealtimeService {
+    late RealtimeChannel _channel;
+    
+    void subscribeToSignals() {
+        _channel = supabase.channel('signals');
+        _channel.on(RealtimeListenTypes.broadcast, 
+            ChannelFilter(event: 'new_signal'), (payload, [ref]) {
+            // Handle new signal
+            _handleNewSignal(payload);
+        }).subscribe();
+    }
+}
+```
+
+### 🛡️ Supabase Security
+- **RLS Policies:** Kullanıcı bazlı veri erişimi
+- **JWT Tokens:** Otomatik token yönetimi
+- **API Keys:** Anon/Service key ayrımı
+- **Database Triggers:** Otomatik timestamp updates
+
+### 📱 Flutter Supabase Integration
+```dart
+// main.dart
+await Supabase.initialize(
+    url: 'YOUR_SUPABASE_URL',
+    anonKey: 'YOUR_SUPABASE_ANON_KEY',
+);
+
+// Authentication
+final response = await supabase.auth.signInWithPassword(
+    email: email,
+    password: password,
+);
+
+// Database operations
+final data = await supabase
+    .from('signals')
+    .select()
+    .eq('is_active', true)
+    .order('created_at', ascending: false);
+```
+
+### 🔧 Backend Supabase Client
+```go
+// internal/services/supabase/client.go
+type Client struct {
+    URL     string
+    APIKey  string
+    Client  *http.Client
+}
+
+func (c *Client) Insert(table string, data interface{}) error {
+    // Supabase REST API insert
+}
+
+func (c *Client) Select(table string, query string) ([]byte, error) {
+    // Supabase REST API select
+}
+```
+
+Bu strateji, projenin başarılı bir şekilde tamamlanması için gerekli tüm adımları, teknolojileri ve best practiceleri içermektedir. Her aşama detaylı olarak planlanmış ve SOLID prensiplerine uygun olarak tasarlanmıştır. Supabase entegrasyonu ile modern, scalable ve güvenli bir uygulama geliştireceğiz.

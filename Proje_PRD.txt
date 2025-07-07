@@ -1,0 +1,104 @@
+ Geliştirici: Ahmet Çetin
+ 1. Lütfen seninle konuştuğum dilde bana cevap ver.
+ 2. Projeyi ingilizce geliştir.
+ 
+
+🎯 Proje Amacı
+Kullanıcıların kripto para borsalarından alınan anlık fiyat verileri ile özelleştirilmiş indikatörlerin analiz ettiği alım-satım bölgelerini görebileceği bir Android & iOS mobil uygulama geliştirmek.
+
+Alım bölgeleri, hedef fiyatlar, stop-loss gibi dinamik sinyaller üretilecek ve kullanıcıya gösterilecek.
+
+🚀 Öne Çıkan Özellikler
+✅ Gerçek zamanlı coin fiyat takibi
+✅ Özel indikatör hesapları (örn: RIBQA, GCR fractal, Ricci Flow bazlı sinyal)
+✅ Alım bölgesi, hedef1-2-3, stop-loss önerileri
+✅ Bildirim (push notification) ile sinyal duyuruları
+✅ Kullanıcı favori coinlerini seçebilecek
+✅ Çoklu para birimi desteği (USD, EUR, TRY vs)
+✅ Temiz UI/UX: dark & light mode
+
+🏗️ Teknoloji Yığını (Tech Stack)
+Katman	Önerilen Teknoloji
+📱 Mobil app	Flutter (Dart) → Android & iOS tek codebase
+🌐 API	Go (Gin veya Fiber) REST API
+🔄 Real-time	Binance WebSocket + Redis pub/sub
+🗃 DB	PostgreSQL (indikator parametreleri, user preferences)
+⚡ Cache	Redis (tick data, sinyal cache)
+🧠 AI/Calc	Go backend içinde custom indicator libraries
+📈 Data source	Binance, KuCoin, CoinGecko API
+🔔 Push notif.	Firebase Cloud Messaging (FCM)
+🔒 Auth	JWT + Supabase (veya kendi auth db)
+🖥 CI/CD	GitHub Actions + Docker build
+📝 Monitor	Sentry (error log), Grafana (metrics)
+
+🧩 Temel Ekranlar & İşlevler
+Ekran / Modül	Özellikler
+📊 Dashboard	BTC, ETH, SOL gibi favori coinlerin anlık fiyatı + son sinyal durumu
+🔍 Coin Detail	Seçilen coin için alım bölgesi, hedef1-2-3, stop-loss
+⚙ Settings	Para birimi seçimi, dil, bildirim tercihleri
+🔔 Notifications	Yeni sinyal geldiğinde göster
+💎 About / Licenses	Versiyon, gizlilik, kullanım koşulları
+
+🔥 İş Akışı (High-Level Flow)
+Mobil app açılır →
+
+Go backend’den GET /coins çağrısı ile anlık fiyat & sinyal dataları gelir →
+
+Kullanıcının favori coinleri filtrelenir →
+
+İlgili sinyaller ekranlarda gösterilir:
+
+makefile
+Copy
+Edit
+SOL
+Alım: 256.34 USD
+Hedef1: 260
+Hedef2: 271
+Hedef3: 280
+Stop: 249
+Yeni sinyal çıkarsa → Firebase ile push notification gider.
+
+⚙ Backend Görevleri
+✅ Binance REST & WebSocket’den data çek →
+✅ Redis’e publish →
+✅ Özel indikatör engine’inde işleyip sinyal üret →
+✅ PostgreSQL’de son sinyalleri + logları sakla →
+✅ REST API endpoint’leri ile app’e sun.
+
+🚀 Örnek API endpoint’leri
+bash
+Copy
+Edit
+GET /api/v1/coins
+  -> [{ symbol: SOL, price: 256.34, buy_zone: 255-257, targets:[260,271,280], stop:249 }]
+
+GET /api/v1/user/favorites
+  -> ["SOL","BTC","ETH"]
+
+POST /api/v1/user/favorites
+  body: {"add":"XRP"}
+🔐 Güvenlik & Performans
+JWT ile mobil login → user bazlı favoriler, ayarlar.
+
+Redis cache → Websocket data’yı anında analiz.
+
+Rate limiting & anti-DDOS (Gin middleware veya Traefik/Nginx).
+
+📝 İş Takvimi (örnek MVP)
+Hafta	Görev
+1	API tasarımı (Go), DB şeması
+2-3	Binance API & WS entegrasyonu
+4	İndikatör hesap modülü
+5-6	Flutter frontend ekranları
+7	Push notification + favoriler
+8	Test + Docker + CI/CD
+9	Play Store & App Store deploy
+
+🎯 Başarı KPI’ları
+Ortalama API yanıt süresi < 200ms
+
+Push notification delay < 1sn
+
+İlk MVP’de min. 100 sinyal/gün üretimi
+
